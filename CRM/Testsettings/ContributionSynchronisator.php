@@ -18,7 +18,7 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
     
     
     //if the contact test is succesfull we enable normal sync
-    return $return;
+    //return $return;
     
     //to test we return false so no contributions are synced to Odoo
     return false;
