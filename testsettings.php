@@ -6,12 +6,6 @@ function testsettings_civicrm_odoo_synchronisator(CRM_Odoosync_Model_ObjectDefin
   if ($objectDefinition instanceof CRM_OdooContributionSync_ContributionDefinition) {
     $synchronisator = 'CRM_Testsettings_ContributionSynchronisator';
   }
-  if ($objectDefinition instanceof CRM_Sepamandaat_OdooSync_Definition) {
-    $synchronisator = 'CRM_Testsettings_MandaatSynchronisator';
-  }
-  if ($objectDefinition instanceof CRM_Ibanodoosync_Definition) {
-    $synchronisator = 'CRM_Testsettings_IbanSynchronisator';
-  }
 }
 
 /**

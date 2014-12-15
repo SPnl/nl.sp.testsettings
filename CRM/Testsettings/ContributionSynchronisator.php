@@ -11,7 +11,7 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
     if ($return) {
       $contribution = $this->getContribution($sync_entity->getEntityId());
       $date = new DateTime($contribution['receive_date']);
-      if ($date->format('Ymd') < 20141213) {
+      if ($date->format('Ymd') < 20141215) {
         $return = false;
       }
     }
