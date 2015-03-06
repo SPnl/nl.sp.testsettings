@@ -6,6 +6,10 @@
 class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSync_ContributionSynchronisator {
   
   public function isThisItemSyncable(CRM_Odoosync_Model_OdooEntity $sync_entity) {
+
+    //to test we return false so no contributions are synced to Odoo
+    return false;
+
     $return = parent::isThisItemSyncable($sync_entity);
     //do not sync contributions with a date before 13 december 2014
     if ($return) {
@@ -19,9 +23,6 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
     
     //if the contact test is succesfull we enable normal sync
     return $return;
-    
-    //to test we return false so no contributions are synced to Odoo
-    //return false;
   }
   
 }
