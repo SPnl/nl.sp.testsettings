@@ -10,7 +10,7 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
    *
    * @return bool
    */
-  public function upgrade_1001() {
+  public function upgrade_1004() {
 
     $contactIds = array();
     $group_id = civicrm_api3('Group', 'getvalue', array('return' => 'id', 'title' => 'Test: voor incasso contributie SP lidmaatschap'));

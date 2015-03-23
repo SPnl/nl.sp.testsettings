@@ -29,7 +29,7 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
         return false;
       }
     }
-    
+
     return false;
   }
   
