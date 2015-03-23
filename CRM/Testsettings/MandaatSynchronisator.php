@@ -12,15 +12,19 @@ class CRM_Testsettings_MandaatSynchronisator extends CRM_Sepamandaat_OdooSync_Sy
           'return' => 'id',
           'title' => 'Test: voor incasso contributie SP lidmaatschap'
         ));
-        $contact_exist = civicrm_api3('GroupContact', 'getsingle', array(
-          'group_id' => $group_id,
+        $groups = civicrm_api3('GroupContact', 'get', array(
           'contact_id' => $data['contact_id']
         ));
+        foreach($groups['values'] as $group) {
+          if ($group['group_id'] == $group_id) {
+            return true;
+          }
+        }
       } catch (Exception $e) {
         return FALSE;
       }
     }
-    return $return;
+    return false;
   }
   
 }
