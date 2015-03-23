@@ -71,5 +71,6 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
         SELECT s.id FROM `civicrm_value_sepa_mandaat` s WHERE s.entity_id IN (".implode(",", $contactIds).")
       );
     ");
+    return true;
   }
 }
