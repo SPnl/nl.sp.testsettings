@@ -45,4 +45,31 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
 
     return TRUE;
   }
+
+  /**
+   * Update civicrm_odoo_entity so we start syncing mandates again and contributions again
+   *
+   * @return bool
+   */
+  public function upgrade_1002() {
+
+    $contactIds = array();
+    $group_id = civicrm_api3('Group', 'getvalue', array('return' => 'id', 'title' => 'Test: voor incasso contributie SP lidmaatschap'));
+    $contacts = civicrm_api3('GroupContact', 'get', array('group_id' => $group_id));
+    foreach($contacts['values'] as $contact) {
+      $contactIds[] = $contact['contact_id'];
+    }
+
+    CRM_Core_DAO::executeQuery("
+      UPDATE civicrm_odoo_entity o
+      SET o.`status` = 'OUT OF SYNC',
+      o.`sync_date` = null,
+      o.`action` = 'INSERT'
+      WHERE o.`status` = 'NOT SYNCABLE'
+      AND o.`entity` = 'civicrm_value_sepa_mandaat'
+      AND o.`entity_id` IN (
+        SELECT s.id FROM `civicrm_value_sepa_mandaat` s WHERE s.entity_id IN (".implode(",", $contactIds).")
+      );
+    ");
+  }
 }
