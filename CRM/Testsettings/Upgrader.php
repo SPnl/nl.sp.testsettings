@@ -19,8 +19,8 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
       $contactIds[] = $contact['contact_id'];
     }
 
-    $this->executeSql("
-      UPDATE civicrm_odoo_sync_entity o
+    CRM_Core_DAO::executeQuery("
+      UPDATE civicrm_odoo_entity o
       SET o.`status` = 'OUT OF SYNC',
       o.`sync_date` = null,
       o.`action` = 'INSERT'
@@ -31,8 +31,8 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
       );
     ");
 
-    $this->executeSql("
-      UPDATE civicrm_odoo_sync_entity o
+    CRM_Core_DAO::executeQuery("
+      UPDATE civicrm_odoo_entity o
       SET o.`status` = 'OUT OF SYNC',
       o.`sync_date` = null,
       o.`action` = 'INSERT'
