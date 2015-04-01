@@ -10,7 +10,7 @@ class CRM_Testsettings_MandaatSynchronisator extends CRM_Sepamandaat_OdooSync_Sy
         //has contact group 'Test: voor incasso contributie SP lidmaatschap'
         $group_id = civicrm_api3('Group', 'getvalue', array(
           'return' => 'id',
-          'title' => 'Test: voor incasso contributie SP lidmaatschap'
+          'title' => 'Test: totaal uitwisseling Civi Odoo'
         ));
         $groups = civicrm_api3('GroupContact', 'get', array(
           'contact_id' => $data['contact_id']
