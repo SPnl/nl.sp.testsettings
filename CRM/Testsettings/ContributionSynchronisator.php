@@ -18,7 +18,8 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
         //has contact group 'Test: voor incasso contributie SP lidmaatschap'
         $group_id = civicrm_api3('Group', 'getvalue', array('return' => 'id', 'title' => 'Test: totaal uitwisseling Civi Odoo'));
         $groups = civicrm_api3('GroupContact', 'get', array(
-          'contact_id' => $contribution['contact_id']
+          'contact_id' => $contribution['contact_id'],
+          'options' => array('limit' => 999),
         ));
         foreach($groups['values'] as $group) {
           if ($group['group_id'] == $group_id) {

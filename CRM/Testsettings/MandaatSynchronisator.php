@@ -13,7 +13,8 @@ class CRM_Testsettings_MandaatSynchronisator extends CRM_Sepamandaat_OdooSync_Sy
           'title' => 'Test: totaal uitwisseling Civi Odoo'
         ));
         $groups = civicrm_api3('GroupContact', 'get', array(
-          'contact_id' => $data['contact_id']
+          'contact_id' => $data['contact_id'],
+          'options' => array('limit' => 999),
         ));
         foreach($groups['values'] as $group) {
           if ($group['group_id'] == $group_id) {
