@@ -31,8 +31,6 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
                   INNER JOIN `civicrm_membership_type` mt on m.membership_type_id = mt.id
                   where (
                     mt.name = 'Lid SP'
-                    OR mt.name = 'Lid ROOD'
-                    OR mt.name = 'Lid SP en ROOD'
                   ) and mp.contribution_id = %1",
                 array(
                   1 => array($contribution['id'], 'Integer')
