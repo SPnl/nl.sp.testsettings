@@ -10,11 +10,11 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
    *
    * @return bool
    */
-  public function upgrade_1006() {
+  public function upgrade_1008() {
 
     $contactIds = array();
     $group_id = civicrm_api3('Group', 'getvalue', array('return' => 'id', 'title' => 'Test: totaal uitwisseling Civi Odoo'));
-    $contacts = civicrm_api3('GroupContact', 'get', array('group_id' => $group_id));
+    $contacts = civicrm_api3('GroupContact', 'get', array('group_id' => $group_id, 'options' => array('limit' => 999)));
     foreach($contacts['values'] as $contact) {
       $contactIds[] = $contact['contact_id'];
     }
