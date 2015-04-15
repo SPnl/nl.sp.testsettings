@@ -5,7 +5,7 @@
  */
 class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
 
-  public function upgrade_1011() {
+  public function upgrade_1012() {
     CRM_Core_DAO::executeQuery("
       UPDATE civicrm_odoo_entity o
       SET o.`status` = 'OUT OF SYNC',
