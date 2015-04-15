@@ -35,7 +35,7 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
       WHERE o.`status` = 'NOT SYNCABLE'
       AND o.`entity` = 'civicrm_value_sepa_mandaat'
       AND o.`entity_id` IN (
-        SELECT s.id FROM `civicrm_value_sepa_mandaat` s WHERE s.status = 'RCUR')
+        SELECT s.id FROM `civicrm_value_sepa_mandaat` s WHERE s.status = 'RCUR'
       );
     ");
     return true;
