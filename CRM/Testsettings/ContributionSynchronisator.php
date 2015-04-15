@@ -15,30 +15,27 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
     if ($return) {
       $contribution = $this->getContribution($sync_entity->getEntityId());
       try {
-        //has contact group 'Test: voor incasso contributie SP lidmaatschap'
-        $group_id = civicrm_api3('Group', 'getvalue', array('return' => 'id', 'title' => 'Test: totaal uitwisseling Civi Odoo'));
-        $groups = civicrm_api3('GroupContact', 'get', array(
-          'contact_id' => $contribution['contact_id'],
-          'options' => array('limit' => 999),
-        ));
-        foreach($groups['values'] as $group) {
-          if ($group['group_id'] == $group_id) {
-            //check if this is a membership payment for Rood, SP, or SP en Rood
-            $count = CRM_Core_DAO::singleValueQuery("
-                  SELECT COUNT(*)
-                  FROM `civicrm_membership_payment` mp
-                  INNER JOIN `civicrm_membership` m on mp.membership_id = m.id
-                  INNER JOIN `civicrm_membership_type` mt on m.membership_type_id = mt.id
-                  where (
-                    mt.name = 'Lid SP'
-                  ) and mp.contribution_id = %1",
-                array(
-                  1 => array($contribution['id'], 'Integer')
-                ));
-            if ($count > 0) {
-              return true;
-            }
-          }
+        //check if this is a membership payment for SP and in q2 and mandaat is RCUR
+        $count = CRM_Core_DAO::singleValueQuery("
+              SELECT COUNT(*)
+              FROM civicrm_contribution c
+              INNER JOIN `civicrm_membership_payment` mp ON c.id = mp.contribution_id
+              INNER JOIN `civicrm_membership` m on mp.membership_id = m.id
+              INNER JOIN `civicrm_membership_type` mt on m.membership_type_id = mt.id
+              INNER JOIN civicrm_contribution_mandaat cm on c.id = cm.entity_id
+              INNER JOIN civicrm_value_sepa_mandaat mandaat on cm.mandaat_id = mandaat.mandaat_nr
+              where
+              (
+                mt.name = 'Lid SP'
+              )
+              AND MONTH(DATE(c.receive_date)) BETWEEN 4 AND 6
+              AND mandaat.status = 'RCUR'
+              and c.id = %1",
+            array(
+              1 => array($contribution['id'], 'Integer')
+            ));
+        if ($count > 0) {
+          return true;
         }
       } catch (Exception $e) {
         return false;
