@@ -29,7 +29,7 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
                 mt.name = 'Lid SP'
               )
               AND MONTH(DATE(c.receive_date)) BETWEEN 4 AND 6
-              AND mandaat.status = 'RCUR'
+              AND (mandaat.status = 'RCUR' OR mandaat.status = 'FRST')
               and c.id = %1",
             array(
               1 => array($contribution['id'], 'Integer')
