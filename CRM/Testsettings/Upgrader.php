@@ -5,6 +5,61 @@
  */
 class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
 
+  public function upgrade_1015() {
+    /**
+     * Crediteer geannuleerde bijdragen die tocg in Odoo terecht zijn gekomen
+     * Deze bijdragen worden gecrediteerd in Odoo en op die manier kunnen ze terug gestort worden
+     */
+    $cancel_id = CRM_Core_OptionGroup::getValue('contribution_status', 'Cancelled', 'name');
+    $sql = "SELECT e.odoo_id, e.id
+            FROM civicrm_odoo_entity e
+            LEFT JOIN civicrm_contribution c ON e.entity = 'civicrm_contribution' AND e.entity_id = c.id
+            WHERE e.odoo_id IS NOT NULL and e.status = 'SYNCED'
+            AND c.contribution_status_id = '".$cancel_id."'";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+    while ($dao->fetch()) {
+      $title = ts('Correct invoice with Odoo id: %1', array(
+        1 => $dao->odoo_id,
+      ));
+      $this->addTask($title, 'creditCancelledInvoice', $dao->odoo_id, $dao->id);
+    }
+
+    return true;
+  }
+
+  public static function creditCancelledInvoice($odoo_invoice_id, $sync_entity_id) {
+    $connector = CRM_Odoosync_Connector::singleton();
+    $is_deletable = false;
+    $invoice = $connector->read('account.invoice', $odoo_invoice_id);
+    if (isset($invoice['state']) && $invoice['state']->scalarval() == 'draft') {
+      $is_deletable = true;
+    }
+
+    if ($is_deletable) {
+      $connector->unlink('account.invoice', $odoo_invoice_id);
+    } else {
+      $now = new DateTime();
+      $dao = CRM_Core_DAO::singleValueQuery("SELECT * FROM civicrm_odoo_entity where id = %1", array(1=>array($sync_entity_id, 'Integer')));
+      $sync_entity = new CRM_Odoosync_Model_OdooEntity($dao);
+      if ($sync_entity->getOdooField() != 'refunded') {
+        $credit = new CRM_OdooContributionSync_CreditInvoice();
+        $result = $credit->credit($odoo_invoice_id, $now);
+        if ($result) {
+          $sync_entity->setOdooField('refunded');
+        }
+
+        $sql = "UPDATE `civicrm_odoo_entity` SET `action` = NULL, `odoo_field` = %1, `sync_date` = NOW(), `last_error` = NULL, `last_error_date` = NULL WHERE `id` = %2";
+        CRM_Core_DAO::executeQuery($sql, array(
+          1 => array($sync_entity->getOdooField(), 'String'),
+          2 => array($sync_entity_id, 'Positive'),
+        ));
+
+      }
+    }
+
+    return true;
+  }
+
   public function upgrade_1014() {
     CRM_Core_DAO::executeQuery("
       UPDATE civicrm_odoo_entity o
