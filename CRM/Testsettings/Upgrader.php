@@ -43,6 +43,7 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
       $sync_entity = new CRM_Odoosync_Model_OdooEntity($dao);
       if ($sync_entity->getOdooField() != 'refunded') {
         $credit = new CRM_OdooContributionSync_CreditInvoice();
+        $credit->setReference("Geannuleerde contributies");
         $result = $credit->credit($odoo_invoice_id, $now);
         if ($result) {
           $sync_entity->setOdooField('refunded');
