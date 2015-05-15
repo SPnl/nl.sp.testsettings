@@ -67,7 +67,7 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
     }
 
     $session = CRM_Core_Session::singleton();
-    $session->setStatus($message);
+    //$session->setStatus($message);
 
     return true;
   }
