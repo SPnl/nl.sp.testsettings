@@ -5,7 +5,7 @@
  */
 class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
 
-  public function upgrade_1015() {
+  public function upgrade_1016() {
     /**
      * Crediteer geannuleerde bijdragen die tocg in Odoo terecht zijn gekomen
      * Deze bijdragen worden gecrediteerd in Odoo en op die manier kunnen ze terug gestort worden
@@ -15,7 +15,7 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
             FROM civicrm_odoo_entity e
             LEFT JOIN civicrm_contribution c ON e.entity = 'civicrm_contribution' AND e.entity_id = c.id
             WHERE e.odoo_id IS NOT NULL and e.status = 'SYNCED' and odoo_field != 'refunded'
-            AND c.contribution_status_id = '".$cancel_id."' LIMIT 0,2";
+            AND c.contribution_status_id = '".$cancel_id."'";
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       $title = ts('Correct invoice with Odoo id: %1', array(
