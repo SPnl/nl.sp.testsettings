@@ -14,8 +14,8 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
     $sql = "SELECT e.odoo_id, e.id
             FROM civicrm_odoo_entity e
             LEFT JOIN civicrm_contribution c ON e.entity = 'civicrm_contribution' AND e.entity_id = c.id
-            WHERE e.odoo_id IS NOT NULL and e.status = 'SYNCED'
-            AND c.contribution_status_id = '".$cancel_id."'";
+            WHERE e.odoo_id IS NOT NULL and e.status = 'SYNCED' and odoo_field != 'refunded'
+            AND c.contribution_status_id = '".$cancel_id."' LIMIT 0,2";
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       $title = ts('Correct invoice with Odoo id: %1', array(
@@ -35,7 +35,10 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
       $is_deletable = true;
     }
 
+    $message = 'Odoo id: '.$odoo_invoice_id;
+
     if ($is_deletable) {
+      $message .= ' deleted';
       $connector->unlink('account.invoice', $odoo_invoice_id);
     } else {
       $now = new DateTime();
@@ -49,6 +52,8 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
           $sync_entity->setOdooField('refunded');
         }
 
+        $message .= ' refund id: '.$result;
+
         $sql = "UPDATE `civicrm_odoo_entity` SET `action` = NULL, `odoo_field` = %1, `sync_date` = NOW(), `last_error` = NULL, `last_error_date` = NULL WHERE `id` = %2";
         CRM_Core_DAO::executeQuery($sql, array(
           1 => array($sync_entity->getOdooField(), 'String'),
@@ -57,6 +62,9 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
 
       }
     }
+
+    $session = CRM_Core_Session::singleton();
+    $session->setStatus($message);
 
     return true;
   }
