@@ -42,7 +42,10 @@ class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
       $connector->unlink('account.invoice', $odoo_invoice_id);
     } else {
       $now = new DateTime();
-      $dao = CRM_Core_DAO::singleValueQuery("SELECT * FROM civicrm_odoo_entity where id = %1", array(1=>array($sync_entity_id, 'Integer')));
+      $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_odoo_entity where id = %1", array(1=>array($sync_entity_id, 'Integer')));
+      if (!$dao->fetch()) {
+        Throw new Exception('Could not fetch odoo entity from civicrm_odoo_entity');
+      }
       $sync_entity = new CRM_Odoosync_Model_OdooEntity($dao);
       if ($sync_entity->getOdooField() != 'refunded') {
         $credit = new CRM_OdooContributionSync_CreditInvoice();
