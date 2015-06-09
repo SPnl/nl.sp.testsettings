@@ -27,6 +27,10 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
               where
               (
                 mt.name = 'Lid SP'
+                OR
+                mt.name = 'Lid ROOD'
+                OR
+                mt.name = 'Lid SP en ROOD'
               )
               AND MONTH(DATE(c.receive_date)) BETWEEN 4 AND 6
               AND (mandaat.status = 'RCUR' OR mandaat.status = 'FRST')

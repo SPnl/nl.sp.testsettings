@@ -5,6 +5,67 @@
  */
 class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
 
+  public function upgrade_1018() {
+    $sql = "
+      UPDATE civicrm_odoo_entity o
+      SET o.`status` = 'OUT OF SYNC',
+      o.`sync_date` = null,
+      o.`action` = 'INSERT'
+      WHERE o.`status` = 'NOT SYNCABLE'
+      AND o.`entity` = 'civicrm_contribution'
+      AND o.`entity_id` IN
+              (SELECT c.id
+              FROM civicrm_contribution c
+              INNER JOIN `civicrm_membership_payment` mp ON c.id = mp.contribution_id
+              INNER JOIN `civicrm_membership` m on mp.membership_id = m.id
+              INNER JOIN `civicrm_membership_type` mt on m.membership_type_id = mt.id
+              INNER JOIN civicrm_contribution_mandaat cm on c.id = cm.entity_id
+              INNER JOIN civicrm_value_sepa_mandaat mandaat on cm.mandaat_id = mandaat.mandaat_nr
+              where
+              (
+                mt.name = 'Lid ROOD'
+                OR
+                mt.name = 'Lid SP en ROOD'
+              )
+              AND MONTH(DATE(c.receive_date)) BETWEEN 4 AND 6
+              AND (mandaat.status = 'RCUR' OR mandaat.status = 'FRST')
+        )
+    ";
+    CRM_Core_DAO::executeQuery($sql);
+    return true;
+  }
+
+  public function upgrade_1017() {
+    $sql = "
+      UPDATE civicrm_odoo_entity o
+        SET o.`status` = 'OUT OF SYNC',
+            o.`sync_date` = null,
+            o.`action` = 'INSERT'
+        WHERE
+          o.`status` = 'NOT SYNCABLE'
+          AND o.`entity` = 'civicrm_value_sepa_mandaat'
+          AND o.`entity_id` IN
+              (SELECT mandaat.id
+              FROM civicrm_contribution c
+              INNER JOIN `civicrm_membership_payment` mp ON c.id = mp.contribution_id
+              INNER JOIN `civicrm_membership` m on mp.membership_id = m.id
+              INNER JOIN `civicrm_membership_type` mt on m.membership_type_id = mt.id
+              INNER JOIN civicrm_contribution_mandaat cm on c.id = cm.entity_id
+              INNER JOIN civicrm_value_sepa_mandaat mandaat on cm.mandaat_id = mandaat.mandaat_nr
+              where
+              (
+                mt.name = 'Lid ROOD'
+                OR
+                mt.name = 'Lid SP en ROOD'
+              )
+              AND MONTH(DATE(c.receive_date)) BETWEEN 4 AND 6
+              AND (mandaat.status = 'RCUR' OR mandaat.status = 'FRST')
+        )
+    ";
+    CRM_Core_DAO::executeQuery($sql);
+    return true;
+  }
+
   public function upgrade_1016() {
     /**
      * Crediteer geannuleerde bijdragen die tocg in Odoo terecht zijn gekomen
