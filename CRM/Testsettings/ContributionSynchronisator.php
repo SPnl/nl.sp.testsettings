@@ -22,8 +22,8 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
               INNER JOIN `civicrm_membership_payment` mp ON c.id = mp.contribution_id
               INNER JOIN `civicrm_membership` m on mp.membership_id = m.id
               INNER JOIN `civicrm_membership_type` mt on m.membership_type_id = mt.id
-              INNER JOIN civicrm_contribution_mandaat cm on c.id = cm.entity_id
-              INNER JOIN civicrm_value_sepa_mandaat mandaat on cm.mandaat_id = mandaat.mandaat_nr
+              LEFT JOIN civicrm_contribution_mandaat cm on c.id = cm.entity_id
+              LEFT JOIN civicrm_value_sepa_mandaat mandaat on cm.mandaat_id = mandaat.mandaat_nr
               where
               (
                 mt.name = 'Lid SP'
@@ -33,7 +33,7 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
                 mt.name = 'Lid SP en ROOD'
               )
               AND MONTH(DATE(c.receive_date)) BETWEEN 4 AND 6
-              AND (mandaat.status = 'RCUR' OR mandaat.status = 'FRST')
+              AND (mandaat.status IS NULL OR mandaat.status = 'RCUR' OR mandaat.status = 'FRST')
               and c.id = %1",
             array(
               1 => array($contribution['id'], 'Integer')
