@@ -19,6 +19,7 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
         $count = CRM_Core_DAO::singleValueQuery("
               SELECT COUNT(*)
               FROM civicrm_contribution c
+              INNER JOIN civicrm_financial_type ft on c.financial_type_id = ft.id
               INNER JOIN `civicrm_membership_payment` mp ON c.id = mp.contribution_id
               INNER JOIN `civicrm_membership` m on mp.membership_id = m.id
               INNER JOIN `civicrm_membership_type` mt on m.membership_type_id = mt.id
@@ -31,6 +32,10 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
                 mt.name = 'Lid ROOD'
                 OR
                 mt.name = 'Lid SP en ROOD'
+                OR
+                ft.name = 'Tribune'
+                or
+                ft.name = 'Spanning'
               )
               AND MONTH(DATE(c.receive_date)) BETWEEN 4 AND 6
               AND (mandaat.status IS NULL OR mandaat.status = 'RCUR' OR mandaat.status = 'FRST')
