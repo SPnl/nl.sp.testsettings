@@ -6,7 +6,7 @@
 class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
 
   public function upgrade_1021() {
-    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_contribution where source = 'handmatig'");
+    $dao = CRM_Core_DAO::executeQuery("SELECT c.* FROM civicrm_contribution c left join civicrm_membership_payment mt on c.id = mt.contribution_id  where c.source = 'handmatig' and mt.id is null");
     while($dao->fetch()) {
       //find active membership voor this contact
       $mid = CRM_Core_DAO::singleValueQuery("
