@@ -5,6 +5,62 @@
  */
 class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
 
+  public function upgrade_1021() {
+    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_contribution where source = 'handmatig'");
+    while($dao->fetch()) {
+      //find active membership voor this contact
+      $mid = CRM_Core_DAO::singleValueQuery("
+        SELECT m.id
+        FROM civicrm_membership m
+        inner join civicrm_membership_type mt on m.membership_type_id = mt.id
+        where
+        (
+          mt.name = 'Lid ROOD'
+          OR
+          mt.name = 'Lid SP en ROOD'
+          or
+          mt.name = 'Lid SP'
+        )
+        and m.status_id = 2 and m.contact_id = %1
+        ", array(1=>array($dao->contact_id, 'Integer')));
+      CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_membership_payment` (`membership_id`, `contribution_id`) VALUES (%1, %2)", array(
+        1 => array($mid, 'Integer'),
+        2 => array($dao->id, 'Integer')
+      ));
+    }
+
+    $sql = "
+      UPDATE civicrm_odoo_entity o
+      SET o.`status` = 'OUT OF SYNC',
+      o.`sync_date` = null,
+      o.`action` = 'INSERT'
+      WHERE o.`status` = 'NOT SYNCABLE'
+      AND o.`entity` = 'civicrm_contribution'
+      AND o.`entity_id` IN
+              (SELECT c.id
+              FROM civicrm_contribution c
+              INNER JOIN `civicrm_membership_payment` mp ON c.id = mp.contribution_id
+              INNER JOIN `civicrm_membership` m on mp.membership_id = m.id
+              INNER JOIN `civicrm_membership_type` mt on m.membership_type_id = mt.id
+              LEFT JOIN civicrm_contribution_mandaat cm on c.id = cm.entity_id
+              LEFT JOIN civicrm_value_sepa_mandaat mandaat on cm.mandaat_id = mandaat.mandaat_nr
+              where
+              (
+                mt.name = 'Lid ROOD'
+                OR
+                mt.name = 'Lid SP en ROOD'
+                or
+                mt.name = 'Lid SP'
+              )
+              AND MONTH(DATE(c.receive_date)) BETWEEN 4 AND 6
+              AND (mandaat.status IS NULL or mandaat.status = 'RCUR' OR mandaat.status = 'FRST')
+        )
+    ";
+    CRM_Core_DAO::executeQuery($sql);
+
+    return true;
+  }
+
   public function upgrade_1020() {
     $sql = "
       UPDATE civicrm_odoo_entity o
