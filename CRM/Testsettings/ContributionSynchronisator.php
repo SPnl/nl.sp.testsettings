@@ -16,6 +16,8 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
       $contribution = $this->getContribution($sync_entity->getEntityId());
       if ($this->checkQ2($contribution)) {
         return true;
+      } elseif ($this->checkQ3($contribution)) {
+        return true;
       }
     }
 
