@@ -5,6 +5,35 @@
  */
 class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
 
+  public function upgrade_1022() {
+    $sql = "
+      UPDATE civicrm_odoo_entity o
+      SET o.`status` = 'OUT OF SYNC',
+      o.`sync_date` = null,
+      o.`action` = 'INSERT'
+      WHERE o.`status` = 'NOT SYNCABLE'
+      AND o.`entity` = 'civicrm_contribution'
+      AND o.`entity_id` IN
+              (SELECT c.id
+              FROM civicrm_contribution c
+              INNER JOIN `civicrm_membership_payment` mp ON c.id = mp.contribution_id
+              INNER JOIN `civicrm_membership` m on mp.membership_id = m.id
+              INNER JOIN `civicrm_membership_type` mt on m.membership_type_id = mt.id
+              LEFT JOIN civicrm_contribution_mandaat cm on c.id = cm.entity_id
+              LEFT JOIN civicrm_value_sepa_mandaat mandaat on cm.mandaat_id = mandaat.mandaat_nr
+              where
+              (
+                mt.name = 'Lid SP'
+              )
+              AND MONTH(DATE(c.receive_date)) BETWEEN 7 AND 9
+              AND (mandaat.status IS NULL or mandaat.status = 'RCUR')
+        )
+    ";
+    CRM_Core_DAO::executeQuery($sql);
+
+    return true;
+  }
+
   public function upgrade_1021() {
     $dao = CRM_Core_DAO::executeQuery("SELECT c.* FROM civicrm_contribution c left join civicrm_membership_payment mt on c.id = mt.contribution_id  where c.source = 'handmatig' and mt.id is null");
     while($dao->fetch()) {
