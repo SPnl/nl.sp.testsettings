@@ -5,6 +5,68 @@
  */
 class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
 
+  public function upgrade_1024() {
+    $sql = "
+      UPDATE civicrm_odoo_entity o
+      SET o.`status` = 'OUT OF SYNC',
+      o.`sync_date` = null,
+      o.`action` = 'INSERT'
+      WHERE o.`status` = 'NOT SYNCABLE'
+      AND o.`entity` = 'civicrm_contribution'
+      AND o.`entity_id` IN
+              (SELECT c.id
+              FROM civicrm_contribution c
+              INNER JOIN `civicrm_option_value` ov on c.payment_instrument_id = ov.value
+              INNER JOIN `civicrm_option_group` og ON og.id = ov.option_group_id and og.name = 'payment_instrument'
+              INNER JOIN `civicrm_membership_payment` mp ON c.id = mp.contribution_id
+              INNER JOIN `civicrm_membership` m on mp.membership_id = m.id
+              INNER JOIN `civicrm_membership_type` mt on m.membership_type_id = mt.id
+              where
+              (
+                ov.name = 'sp_acceptgiro'
+                OR
+                ov.name = 'Periodieke overboeking'
+              )
+              and
+              (
+                mt.name = 'Lid ROOD'
+                OR
+                mt.name = 'Lid SP en ROOD'
+                or
+                mt.name = 'Lid SP'
+              )
+        )
+    ";
+    CRM_Core_DAO::executeQuery($sql);
+
+    return true;
+  }
+
+  public function upgrade_1023() {
+    $sql = "
+      UPDATE civicrm_odoo_entity o
+      SET o.`status` = 'OUT OF SYNC',
+      o.`sync_date` = null,
+      o.`action` = 'INSERT'
+      WHERE o.`status` = 'NOT SYNCABLE'
+      AND o.`entity` = 'civicrm_contribution'
+      AND o.`entity_id` IN
+              (SELECT c.id
+              FROM civicrm_contribution c
+              INNER JOIN `civicrm_financial_type` ft ON c.financial_type_id = ft.id
+              where
+              (
+                ft.name = 'Tribune'
+                OR
+                ft.name = 'Spanning'
+              )
+        )
+    ";
+    CRM_Core_DAO::executeQuery($sql);
+
+    return true;
+  }
+
   public function upgrade_1022() {
     $sql = "
       UPDATE civicrm_odoo_entity o

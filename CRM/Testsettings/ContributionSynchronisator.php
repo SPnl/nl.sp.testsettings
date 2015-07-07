@@ -14,13 +14,54 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSy
     //do not sync contributions with a date before 13 december 2014
     if ($return) {
       $contribution = $this->getContribution($sync_entity->getEntityId());
-      if ($this->checkQ2($contribution)) {
+      if ($this->checkSpanningOrTribune($contribution)) {
+        return TRUE;
+      } elseif ($this->checkAcceptgiroAndPeriodiek($contribution)) {
+        return true;
+      } elseif ($this->checkQ2($contribution)) {
         return true;
       } elseif ($this->checkQ3($contribution)) {
         return true;
       }
     }
 
+    return false;
+  }
+
+  protected function checkSpanningOrTribune($contribution) {
+    $config = CRM_Testsettings_Config::singleton();
+    $financial_type_id = $contribution['financial_type_id'];
+    if (isset($config->financial_types[$financial_type_id]['name'])) {
+      $financial_type = $config->financial_types[$financial_type_id]['name'];
+      switch ($financial_type) {
+        case 'Tribune':
+        case 'Spanning':
+          return true;
+      }
+    }
+    return false;
+  }
+
+  protected function checkAcceptgiroAndPeriodiek($contribution) {
+    $config = CRM_Testsettings_Config::singleton();
+    $payment_instrument_id = $contribution['instrument_id'];
+    $financial_type_id = $contribution['financial_type_id'];
+    if (isset($config->payment_instruments[$payment_instrument_id]['name'])) {
+      $payment_instrument = $config->payment_instruments[$payment_instrument_id]['name'];
+      switch ($payment_instrument) {
+        case 'sp_acceptgiro':
+        case 'Periodieke overboeking':
+          $financial_type = $config->financial_types[$financial_type_id]['name'];
+          switch ($financial_type) {
+            case 'Contributie ROOD':
+            case 'Contributie SP+ROOD':
+            case 'Contributie SP':
+              return TRUE;
+              break;
+          }
+          break;
+      }
+    }
     return false;
   }
 
