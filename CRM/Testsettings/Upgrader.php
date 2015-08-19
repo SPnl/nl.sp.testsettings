@@ -5,6 +5,40 @@
  */
 class CRM_Testsettings_Upgrader extends CRM_Testsettings_Upgrader_Base {
 
+  public function upgrade_1025() {
+    $sql = "
+      UPDATE civicrm_odoo_entity o
+      SET o.`status` = 'OUT OF SYNC',
+      o.`sync_date` = null,
+      o.`action` = 'INSERT'
+      WHERE o.`status` = 'NOT SYNCABLE'
+      AND o.`entity` = 'civicrm_contribution'
+    ";
+    CRM_Core_DAO::executeQuery($sql);
+
+    $sql = "
+      UPDATE civicrm_odoo_entity o
+      SET o.`status` = 'OUT OF SYNC',
+      o.`sync_date` = null,
+      o.`action` = 'INSERT'
+      WHERE o.`status` = 'NOT SYNCABLE'
+      AND o.`entity` = 'civicrm_value_sepa_mandaat '
+    ";
+    CRM_Core_DAO::executeQuery($sql);
+
+    $sql = "
+      UPDATE civicrm_odoo_entity o
+      SET o.`status` = 'OUT OF SYNC',
+      o.`sync_date` = null,
+      o.`action` = 'INSERT'
+      WHERE o.`status` = 'NOT SYNCABLE'
+      AND o.`entity` = 'civicrm_value_payment_arrangement'
+    ";
+    CRM_Core_DAO::executeQuery($sql);
+
+    return true;
+  }
+
   public function upgrade_1024() {
     $sql = "
       UPDATE civicrm_odoo_entity o
