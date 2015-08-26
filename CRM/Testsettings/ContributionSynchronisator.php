@@ -3,7 +3,7 @@
 /**
  * This class prevents contribution to sync to Odoo
  */
-class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSync_ContributionSynchronisator {
+class CRM_Testsettings_ContributionSynchronisator extends CRM_Spodoosync_Synchronisator_ContributionSynchronisator {
   
   public function isThisItemSyncable(CRM_Odoosync_Model_OdooEntity $sync_entity) {
 
