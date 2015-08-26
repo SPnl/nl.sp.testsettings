@@ -3,7 +3,7 @@
 /**
  * This class prevents contribution to sync to Odoo
  */
-class CRM_Testsettings_ContributionSynchronisator extends CRM_Spodoosync_Synchronisator_ContributionSynchronisator {
+class CRM_Testsettings_ContributionSynchronisator extends CRM_OdooContributionSync_ContributionSynchronisator {
   
   public function isThisItemSyncable(CRM_Odoosync_Model_OdooEntity $sync_entity) {
 
@@ -11,14 +11,20 @@ class CRM_Testsettings_ContributionSynchronisator extends CRM_Spodoosync_Synchro
     //return false;
 
     $return = parent::isThisItemSyncable($sync_entity);
+
     //do not sync contributions with a date before 13 december 2014
     if ($return) {
       $contribution = $this->getContribution($sync_entity->getEntityId());
-      if ($this->checkNotEventContribution($contribution)) {
-        return TRUE;
+      $receive_date = new DateTime($contribution['receive_date']);
+      if ($receive_date->format('Y') >= 2015) {
+        if ($this->checkNotEventContribution($contribution)) {
+          return TRUE;
+        }
       }
     }
-
+    if ($sync_entity->getOdooId()) {
+      $this->performDelete($sync_entity->getOdooId(), $sync_entity);
+    }
     return false;
   }
 
