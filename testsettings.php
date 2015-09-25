@@ -3,9 +3,9 @@
 require_once 'testsettings.civix.php';
 
 function testsettings_civicrm_odoo_synchronisator(CRM_Odoosync_Model_ObjectDefinition $objectDefinition, &$synchronisator) {
-  if ($objectDefinition instanceof CRM_OdooContributionSync_ContributionDefinition) {
+  /*if ($objectDefinition instanceof CRM_OdooContributionSync_ContributionDefinition) {
     $synchronisator = 'CRM_Testsettings_ContributionSynchronisator';
-  }
+  }*/
   if ($objectDefinition instanceof CRM_Sepamandaat_OdooSync_Definition) {
     $synchronisator = 'CRM_Testsettings_MandaatSynchronisator';
   }
